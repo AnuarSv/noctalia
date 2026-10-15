@@ -448,6 +448,7 @@ void PipeWireSpectrum::handleAudioStateChanged() {
 }
 
 void PipeWireSpectrum::rebuildStream() {
+  clearValues(true);
   m_stream.reset();
   m_boundNodeId = 0;
   m_boundTargetObject.clear();
@@ -455,19 +456,16 @@ void PipeWireSpectrum::rebuildStream() {
   const std::uint32_t target = resolvedTargetNodeId();
   const auto* targetNode = resolvedTargetNode();
   if (!hasListeners() || target == 0 || targetNode == nullptr) {
-    clearValues(true);
     return;
   }
   if (targetNode->name.empty()) {
     kLog.warn("spectrum target node {} has no PipeWire node name", target);
-    clearValues(true);
     return;
   }
 
   m_stream = std::make_unique<Stream>(*this, target, targetNode->name);
   if (!m_stream->start()) {
     m_stream.reset();
-    clearValues(true);
     return;
   }
 
